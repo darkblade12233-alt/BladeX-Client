@@ -17,10 +17,11 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Setup Java 8
+        uses: actions/setup-java@v4
         with:
-          python-version: '3.12'
+          distribution: temurin
+          java-version: '8'
 
       - name: Install Qt 5.15.2
         uses: jurplel/install-qt-action@v4
@@ -31,16 +32,40 @@ jobs:
           arch: win64_mingw81
           aqtversion: '==3.2.1'
 
-      - name: Check available MinGW tools
+      - name: Setup MinGW compiler
+        uses: egor-tensin/setup-mingw@v2
+        with:
+          version: 8.1.0
+          platform: x64
+
+      - name: Add MinGW to PATH
         shell: pwsh
         run: |
-          python -m pip install aqtinstall==3.2.1
-          python -m aqt list-tool windows desktop tools_mingw
+          echo "C:\mingw64\bin" >> $env:GITHUB_PATH
+
+      - name: Check compiler versions
+        shell: bash
+        run: |
+          gcc --version
+          g++ --version
+          cmake --version
+
+      - name: Build and install ZLIB
+        shell: bash
+        run: |
+          git clone --depth 1 https://github.com/madler/zlib.git
+          cmake -S zlib -B zlib-build -G "MinGW Makefiles" \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX="$PWD/zlib-install"
+          cmake --build zlib-build --parallel 2
+          cmake --install zlib-build
 
       - name: Configure project
         shell: bash
         run: |
-          cmake -S . -B build -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release
+          cmake -S . -B build -G "MinGW Makefiles" \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_PREFIX_PATH="$PWD/zlib-install;${QT_ROOT_DIR}/5.15.2/mingw81_64"
 
       - name: Build BLADEX CLIENT
         shell: bash
