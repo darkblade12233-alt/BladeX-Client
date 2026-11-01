@@ -74,10 +74,19 @@ jobs:
             -DZLIB_INCLUDE_DIR="$PWD/zlib-install/include" \
             -DZLIB_LIBRARY="$PWD/zlib-install/lib/libzs.a"
 
-      - name: Build BLADEX CLIENT
+           - name: Build BLADEX CLIENT
         shell: bash
         run: |
           cmake --build build --parallel 2
+
+      - name: Copy MinGW runtime DLLs
+        shell: bash
+        run: |
+          MINGW_BIN="$(dirname "$(which g++)")"
+          mkdir -p build/runtime
+          cp "$MINGW_BIN/libgcc_s_seh-1.dll" build/runtime/
+          cp "$MINGW_BIN/libstdc++-6.dll" build/runtime/
+          cp "$MINGW_BIN/libwinpthread-1.dll" build/runtime/
 
       - name: Upload build files
         uses: actions/upload-artifact@v4
@@ -85,4 +94,3 @@ jobs:
           name: BLADEX-CLIENT-Windows
           path: build/
           if-no-files-found: error
-
