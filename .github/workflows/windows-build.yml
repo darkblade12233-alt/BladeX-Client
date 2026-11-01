@@ -65,28 +65,40 @@ jobs:
           echo "Checking installed ZLIB files:"
           find zlib-install -type f
 
-      - name: Configure project
+       - name: Configure project
         shell: bash
         run: |
           cmake -S . -B build -G "MinGW Makefiles" \
             -DCMAKE_BUILD_TYPE=Release \
             -DZLIB_ROOT="$PWD/zlib-install" \
             -DZLIB_INCLUDE_DIR="$PWD/zlib-install/include" \
-            -DZLIB_LIBRARY="$PWD/zlib-install/lib/libzs.a"   
-          
-      - name: Build BLADEX CLIENT 
+            -DZLIB_LIBRARY="$PWD/zlib-install/lib/libzs.a"
+
+      - name: Build BLADEX CLIENT
         shell: bash
         run: |
           cmake --build build --parallel 2
 
-      - name: Copy MinGW runtime DLLs
+      - name: Deploy Qt and MinGW runtime
         shell: bash
         run: |
+          EXE=$(find build -type f -iname "MultiMC.exe" -print -quit)
+
+          if [ -z "$EXE" ]; then
+            echo "MultiMC.exe not found!"
+            exit 1
+          fi
+
+          echo "Found launcher: $EXE"
+
+          windeployqt --release --compiler-runtime "$EXE"
+
           MINGW_BIN="$(dirname "$(which g++)")"
-          mkdir -p build/runtime
-          cp "$MINGW_BIN/libgcc_s_seh-1.dll" build/runtime/
-          cp "$MINGW_BIN/libstdc++-6.dll" build/runtime/
-          cp "$MINGW_BIN/libwinpthread-1.dll" build/runtime/
+          EXE_DIR="$(dirname "$EXE")"
+
+          cp "$MINGW_BIN/libgcc_s_seh-1.dll" "$EXE_DIR/"
+          cp "$MINGW_BIN/libstdc++-6.dll" "$EXE_DIR/"
+          cp "$MINGW_BIN/libwinpthread-1.dll" "$EXE_DIR/"
 
       - name: Upload build files
         uses: actions/upload-artifact@v4
