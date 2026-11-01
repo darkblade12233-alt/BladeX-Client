@@ -1,3 +1,4 @@
+
 name: BLADEX CLIENT Windows Build
 
 on:
@@ -11,7 +12,7 @@ jobs:
     runs-on: windows-2022
 
     steps:
-      - name: Download source code
+      - name: Checkout source code
         uses: actions/checkout@v4
         with:
           submodules: recursive
@@ -31,7 +32,7 @@ jobs:
           arch: win64_mingw81
           aqtversion: '==3.2.1'
 
-      - name: Setup MinGW compiler
+      - name: Setup MinGW
         uses: egor-tensin/setup-mingw@v2
         with:
           version: 8.1.0
@@ -42,24 +43,27 @@ jobs:
         run: |
           echo "C:\mingw64\bin" >> $env:GITHUB_PATH
 
-      - name: Check compiler versions
+      - name: Check tools
         shell: bash
         run: |
           gcc --version
           g++ --version
           cmake --version
+          java -version
 
-      - name: Build and install ZLIB
+      - name: Build ZLIB
         shell: bash
         run: |
           git clone --depth 1 https://github.com/madler/zlib.git
+
           cmake -S zlib -B zlib-build -G "MinGW Makefiles" \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX="$PWD/zlib-install"
+
           cmake --build zlib-build --parallel 2
           cmake --install zlib-build
 
-      - name: Configure project
+      - name: Configure BLADEX CLIENT
         shell: bash
         run: |
           cmake -S . -B build -G "MinGW Makefiles" \
@@ -68,33 +72,52 @@ jobs:
             -DZLIB_INCLUDE_DIR="$PWD/zlib-install/include" \
             -DZLIB_LIBRARY="$PWD/zlib-install/lib/libzs.a"
 
-      - name: Build BLADEX CLIENT
+      - name: Compile BLADEX CLIENT
         shell: bash
         run: |
           cmake --build build --parallel 2
 
-      - name: Deploy Qt and MinGW runtime
+      - name: Deploy Qt and runtime DLLs
         shell: bash
         run: |
+          set -e
+
           EXE=$(find build -type f -iname "MultiMC.exe" -print -quit)
 
           if [ -z "$EXE" ]; then
-            echo "MultiMC.exe not found!"
+            echo "ERROR: MultiMC.exe not found!"
             exit 1
           fi
 
-          echo "Found launcher: $EXE"
-
-          windeployqt --release --compiler-runtime "$EXE"
-
-          MINGW_BIN="$(dirname "$(which g++)")"
           EXE_DIR="$(dirname "$EXE")"
+          MINGW_BIN="$(dirname "$(which g++)")"
 
+          echo "Executable: $EXE"
+          echo "MinGW: $MINGW_BIN"
+
+          echo "Deploying Qt DLLs..."
+          windeployqt --no-plugins --release --compiler-runtime "$EXE"
+
+          echo "Finding Qt platform plugin..."
+          QT_PLUGIN=$(find "$RUNNER_WORKSPACE" -type f \
+            -path "*/plugins/platforms/qwindows.dll" -print -quit)
+
+          if [ -z "$QT_PLUGIN" ]; then
+            echo "ERROR: qwindows.dll not found!"
+            exit 1
+          fi
+
+          mkdir -p "$EXE_DIR/platforms"
+          cp "$QT_PLUGIN" "$EXE_DIR/platforms/qwindows.dll"
+
+          echo "Copying MinGW runtime DLLs..."
           cp "$MINGW_BIN/libgcc_s_seh-1.dll" "$EXE_DIR/"
           cp "$MINGW_BIN/libstdc++-6.dll" "$EXE_DIR/"
           cp "$MINGW_BIN/libwinpthread-1.dll" "$EXE_DIR/"
 
-      - name: Upload build files
+          echo "Deployment completed!"
+
+      - name: Upload Windows build
         uses: actions/upload-artifact@v4
         with:
           name: BLADEX-CLIENT-Windows
