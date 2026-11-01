@@ -43,7 +43,7 @@ jobs:
         run: |
           echo "C:\mingw64\bin" >> $env:GITHUB_PATH
 
-      - name: Check tools
+      - name: Check build tools
         shell: bash
         run: |
           gcc --version
@@ -77,7 +77,7 @@ jobs:
         run: |
           cmake --build build --parallel 2
 
-      - name: Deploy Qt and runtime DLLs
+      - name: Deploy Qt and MinGW runtime
         shell: bash
         run: |
           set -e
@@ -93,12 +93,27 @@ jobs:
           MINGW_BIN="$(dirname "$(which g++)")"
 
           echo "Executable: $EXE"
-          echo "MinGW: $MINGW_BIN"
+          echo "MinGW folder: $MINGW_BIN"
 
-          echo "Deploying Qt DLLs..."
-          windeployqt --no-plugins --release --compiler-runtime "$EXE"
+          echo "Finding Qt installation..."
+
+          QT_CORE=$(find "$RUNNER_WORKSPACE" -type f \
+            -iname "Qt5Core.dll" -print -quit)
+
+          if [ -z "$QT_CORE" ]; then
+            echo "ERROR: Qt5Core.dll not found!"
+            exit 1
+          fi
+
+          QT_BIN="$(dirname "$QT_CORE")"
+
+          echo "Qt folder: $QT_BIN"
+          echo "Copying Qt DLLs..."
+
+          cp "$QT_BIN"/Qt5*.dll "$EXE_DIR/"
 
           echo "Finding Qt platform plugin..."
+
           QT_PLUGIN=$(find "$RUNNER_WORKSPACE" -type f \
             -path "*/plugins/platforms/qwindows.dll" -print -quit)
 
@@ -111,13 +126,19 @@ jobs:
           cp "$QT_PLUGIN" "$EXE_DIR/platforms/qwindows.dll"
 
           echo "Copying MinGW runtime DLLs..."
+
           cp "$MINGW_BIN/libgcc_s_seh-1.dll" "$EXE_DIR/"
           cp "$MINGW_BIN/libstdc++-6.dll" "$EXE_DIR/"
           cp "$MINGW_BIN/libwinpthread-1.dll" "$EXE_DIR/"
 
+          echo "Checking deployment..."
+
+          ls "$EXE_DIR"
+          ls "$EXE_DIR/platforms"
+
           echo "Deployment completed!"
 
-      - name: Upload Windows build
+      - name: Upload BLADEX CLIENT
         uses: actions/upload-artifact@v4
         with:
           name: BLADEX-CLIENT-Windows
