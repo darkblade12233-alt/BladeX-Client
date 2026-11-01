@@ -72,7 +72,7 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release \
             -DZLIB_ROOT="$PWD/zlib-install" \
             -DZLIB_INCLUDE_DIR="$PWD/zlib-install/include" \
-            -DZLIB_LIBRARY="$PWD/zlib-install/lib/libzlibstatic.a"
+            -DZLIB_LIBRARY="$PWD/zlib-install/lib/libzs.a"
 
       - name: Build BLADEX CLIENT
         shell: bash
