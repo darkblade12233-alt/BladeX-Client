@@ -16,6 +16,11 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
       - name: Install Qt 5.15.2
         uses: jurplel/install-qt-action@v4
         with:
