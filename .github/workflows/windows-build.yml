@@ -1,4 +1,3 @@
-
 name: BLADEX CLIENT Windows Build
 
 on:
@@ -54,18 +53,13 @@ jobs:
         shell: bash
         run: |
           git clone --depth 1 https://github.com/madler/zlib.git
-
           cmake -S zlib -B zlib-build -G "MinGW Makefiles" \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX="$PWD/zlib-install"
-
           cmake --build zlib-build --parallel 2
           cmake --install zlib-build
 
-          echo "Checking installed ZLIB files:"
-          find zlib-install -type f
-
-       - name: Configure project
+      - name: Configure project
         shell: bash
         run: |
           cmake -S . -B build -G "MinGW Makefiles" \
