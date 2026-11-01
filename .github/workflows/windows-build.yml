@@ -1,3 +1,4 @@
+
 name: BLADEX CLIENT Windows Build
 
 on:
@@ -29,13 +30,17 @@ jobs:
           target: desktop
           arch: win64_mingw81
           aqtversion: '==3.2.1'
-          tools: 'tools_mingw,8.1.0'
+
+      - name: Check available MinGW tools
+        shell: pwsh
+        run: |
+          python -m pip install aqtinstall==3.2.1
+          python -m aqt list-tool windows desktop tools_mingw
 
       - name: Configure project
         shell: bash
         run: |
-          cmake -S . -B build -G "MinGW Makefiles" \
-            -DCMAKE_BUILD_TYPE=Release
+          cmake -S . -B build -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release
 
       - name: Build BLADEX CLIENT
         shell: bash
@@ -48,3 +53,4 @@ jobs:
           name: BLADEX-CLIENT-Windows
           path: build/
           if-no-files-found: error
+
