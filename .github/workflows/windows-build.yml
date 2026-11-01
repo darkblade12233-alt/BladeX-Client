@@ -54,18 +54,25 @@ jobs:
         shell: bash
         run: |
           git clone --depth 1 https://github.com/madler/zlib.git
+
           cmake -S zlib -B zlib-build -G "MinGW Makefiles" \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX="$PWD/zlib-install"
+
           cmake --build zlib-build --parallel 2
           cmake --install zlib-build
+
+          echo "Checking installed ZLIB files:"
+          find zlib-install -type f
 
       - name: Configure project
         shell: bash
         run: |
           cmake -S . -B build -G "MinGW Makefiles" \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_PREFIX_PATH="$PWD/zlib-install;${QT_ROOT_DIR}/5.15.2/mingw81_64"
+            -DZLIB_ROOT="$PWD/zlib-install" \
+            -DZLIB_INCLUDE_DIR="$PWD/zlib-install/include" \
+            -DZLIB_LIBRARY="$PWD/zlib-install/lib/libzlibstatic.a"
 
       - name: Build BLADEX CLIENT
         shell: bash
