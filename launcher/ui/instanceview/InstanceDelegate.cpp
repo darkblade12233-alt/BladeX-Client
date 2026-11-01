@@ -182,6 +182,7 @@ void ListViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
     initStyleOption(&opt, index);
     painter->save();
     painter->setClipRect(opt.rect);
+    painter->setRenderHint(QPainter::Antialiasing, true);
 
     opt.features |= QStyleOptionViewItem::WrapText;
     opt.text = index.data().toString();
@@ -202,10 +203,16 @@ void ListViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
     textHighlightRect.adjust(0, iconSize + 5, 0, 0);
 
     // draw background
-    {
-        // FIXME: unused
-        // QSize textSize = viewItemTextSize ( &opt );
-        drawSelectionRect(painter, opt, textHighlightRect);
+{
+    painter->setPen(Qt::NoPen);
+
+    if (opt.state & QStyle::State_Selected)
+        painter->setBrush(QColor("#FFC928"));
+    else
+        painter->setBrush(QColor("#20242B"));
+
+    painter->drawRoundedRect(textHighlightRect, 10, 10);
+}
         /*
         QPalette::ColorGroup cg;
         QStyleOptionViewItem opt2(opt);
@@ -260,7 +267,6 @@ void ListViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
             }
         }
         */
-    }
 
     // icon mode and state, also used for badges
     QIcon::Mode mode = QIcon::Normal;
@@ -281,13 +287,13 @@ void ListViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
     if (cg == QPalette::Normal && !(opt.state & QStyle::State_Active))
         cg = QPalette::Inactive;
     if (opt.state & QStyle::State_Selected)
-    {
-        painter->setPen(opt.palette.color(cg, QPalette::HighlightedText));
-    }
-    else
-    {
-        painter->setPen(opt.palette.color(cg, QPalette::Text));
-    }
+{
+    painter->setPen(QColor("#101216"));
+}
+else
+{
+    painter->setPen(QColor("#FFFFFF"));
+}
 
     // draw the text
     QTextOption textOption;
@@ -296,7 +302,10 @@ void ListViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
     textOption.setAlignment(QStyle::visualAlignment(opt.direction, opt.displayAlignment));
     QTextLayout textLayout;
     textLayout.setTextOption(textOption);
-    textLayout.setFont(opt.font);
+    QFont profileFont = opt.font;
+    profileFont.setBold(true);
+    profileFont.setPointSize(10);
+    textLayout.setFont(profileFont);
     textLayout.setText(opt.text);
 
     qreal width, height;

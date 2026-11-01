@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BLADEX CLIENT</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#101216;color:#fff;font-family:Inter,Arial,sans-serif;min-height:100vh}
+.app{display:flex;min-height:100vh}
+.sidebar{width:235px;background:#171a20;padding:28px 18px;border-right:1px solid #292d35}
+.logo{font-size:25px;font-weight:900;letter-spacing:2px;margin-bottom:45px}
+.logo span{color:#ffc928}
+.section{font-size:10px;color:#777f8c;letter-spacing:2px;margin:25px 12px 12px}
+.nav{display:block;width:100%;padding:13px 14px;margin:5px 0;border:0;border-radius:9px;background:transparent;color:#aeb4bf;text-align:left;font-size:14px;cursor:pointer}
+.nav.active,.nav:hover{background:#ffc928;color:#101216;font-weight:800}
+.bottom{margin-top:55px;color:#737b88;font-size:12px;padding:12px}
+main{flex:1;padding:35px 5%;max-width:1400px;margin:auto;width:100%}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:42px}
+.status{color:#a4acb7;font-size:12px}
+.status i{display:inline-block;width:8px;height:8px;background:#61d58b;border-radius:50%;margin-right:7px}
+.avatar{background:#ffc928;color:#101216;padding:12px 15px;border-radius:10px;font-weight:900}
+h1{font-size:34px;margin-bottom:9px}
+.sub{color:#8d96a3;font-size:14px;margin-bottom:30px}
+.hero{background:linear-gradient(115deg,#252a32,#171a20);border:1px solid #343a44;border-radius:18px;padding:30px;margin-bottom:32px;position:relative;overflow:hidden}
+.hero:after{content:"B";position:absolute;right:35px;top:-55px;font-size:230px;font-weight:1000;color:#ffc928;opacity:.06}
+.tag{color:#ffc928;font-size:11px;letter-spacing:2px;font-weight:bold}
+.hero h2{font-size:27px;margin:15px 0 8px}
+.hero p{color:#aab1bd;font-size:13px}
+.btn{background:#ffc928;color:#101216;border:0;border-radius:8px;padding:13px 25px;font-weight:900;cursor:pointer;margin-top:22px}
+.btn:hover{background:#ffdb65}
+.heading{display:flex;justify-content:space-between;align-items:center;margin:28px 0 18px}
+.heading h2{font-size:19px}
+.small{background:#252a32;color:#d7dce4;padding:9px 13px;border:1px solid #343a44;border-radius:7px;cursor:pointer}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:17px}
+.card{background:#191d24;border:1px solid #303640;border-radius:13px;padding:18px;transition:.2s}
+.card:hover{border-color:#ffc928;transform:translateY(-3px)}
+.icon{width:48px;height:48px;background:#292e37;border-radius:11px;display:grid;place-items:center;font-size:23px;margin-bottom:17px}
+.card h3{font-size:16px;margin-bottom:7px}
+.card p{font-size:12px;color:#8993a0}
+.pill{display:inline-block;margin-top:15px;background:#292e37;color:#ffc928;padding:6px 9px;border-radius:5px;font-size:10px}
+.page{display:none}.page.active{display:block}
+@media(max-width:650px){.sidebar{width:75px;padding:20px 8px}.logo{font-size:12px;writing-mode:vertical-rl;margin:10px auto 35px}.nav{font-size:0;text-align:center;padding:13px 5px}.nav: first-letter{font-size:16px}.section,.bottom{display:none}main{padding:22px 15px}.top{margin-bottom:30px}h1{font-size:27px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+<div class="logo">BLADE<span>X</span></div>
+<div class="section">MENU</div>
+<button class="nav active" onclick="showPage('home',this)">⌂ &nbsp; Home</button>
+<button class="nav" onclick="showPage('profiles',this)">▦ &nbsp; Profiles</button>
+<button class="nav" onclick="showPage('settings',this)">⚙ &nbsp; Settings</button>
+<div class="section">OTHER</div>
+<button class="nav" onclick="showPage('about',this)">ⓘ &nbsp; About</button>
+<div class="bottom">BLADEX CLIENT<br>Web Preview v1.0</div>
+</aside>
+
+<main>
+<div class="top">
+<div class="status"><i></i> WEB PREVIEW</div>
+<div class="avatar">DB</div>
+</div>
+
+<section class="page active" id="home">
+<h1>Welcome to BLADEX.</h1>
+<p class="sub">Your Minecraft experience starts here.</p>
+<div class="hero">
+<div class="tag">BLADEX CLIENT / 01</div>
+<h2>Ready to play?</h2>
+<p>Manage your Minecraft profiles and customize your experience.</p>
+<button class="btn" onclick="showPage('profiles',document.querySelectorAll('.nav')[1])">VIEW PROFILES →</button>
+</div>
+<div class="heading"><h2>Quick Access</h2></div>
+<div class="cards">
+<div class="card" onclick="showPage('profiles',document.querySelectorAll('.nav')[1])"><div class="icon">🎮</div><h3>Profiles</h3><p>Manage your Minecraft versions.</p></div>
+<div class="card" onclick="showPage('settings',document.querySelectorAll('.nav')[2])"><div class="icon">⚙️</div><h3>Settings</h3><p>Customize your launcher.</p></div>
+</div>
+</section>
+
+<section class="page" id="profiles">
+<h1>My Profiles</h1>
+<p class="sub">Choose your Minecraft setup.</p>
+<div class="heading"><h2>Installed Profiles</h2><button class="small" onclick="alert('Profile creation will be added later!')">+ Add Profile</button></div>
+<div class="cards">
+<div class="card"><div class="icon">⚔️</div><h3>Minecraft 1.8.9</h3><p>Fabric / PvP Profile</p><span class="pill">PVP</span></div>
+<div class="card"><div class="icon">🌍</div><h3>Minecraft 1.21.11</h3><p>Latest Survival Profile</p><span class="pill">SURVIVAL</span></div>
+<div class="card"><div class="icon">🚀</div><h3>Performance</h3><p>Low-end optimized setup</p><span class="pill">FPS</span></div>
+</div>
+</section>
+
+<section class="page" id="settings">
+<h1>Settings</h1><p class="sub">Launcher preferences.</p>
+<div class="cards"><div class="card"><div class="icon">🎨</div><h3>Appearance</h3><p>Theme: BLADEX Dark</p><span class="pill">YELLOW / BLACK</span></div><div class="card"><div class="icon">☕</div><h3>Java</h3><p>Java configuration preview</p></div></div>
+</section>
+
+<section class="page" id="about">
+<h1>About BLADEX</h1><p class="sub">A custom Minecraft launcher project.</p>
+<div class="hero"><div class="tag">BUILT FOR GAMERS</div><h2>BLADEX CLIENT</h2><p>Designed with a clean interface and a yellow-black identity.</p></div>
+</section>
+</main>
+</div>
+<script>
+function showPage(id,button){
+document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+document.querySelectorAll('.nav').forEach(n=>n.classList.remove('active'));
+if(button)button.classList.add('active');
+}
+</script>
+</body>
+</html>

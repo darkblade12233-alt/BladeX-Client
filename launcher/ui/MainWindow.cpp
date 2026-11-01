@@ -702,6 +702,48 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new MainWindow
 {
     ui->setupUi(this);
 
+    setStyleSheet(R"(
+        QMainWindow {
+            background-color: #101216;
+        }
+
+        QToolBar {
+            background-color: #171A20;
+            border: none;
+            spacing: 8px;
+            padding: 8px;
+        }
+
+        QToolButton {
+            background-color: #242932;
+            color: #FFFFFF;
+            border: 1px solid #303640;
+            border-radius: 7px;
+            padding: 8px 12px;
+        }
+
+        QToolButton:hover {
+            background-color: #FFC928;
+            color: #101216;
+        }
+
+        QStatusBar {
+            background-color: #171A20;
+            color: #FFFFFF;
+        }
+
+        QMenu {
+            background-color: #171A20;
+            color: #FFFFFF;
+            border: 1px solid #FFC928;
+        }
+
+        QMenu::item:selected {
+            background-color: #FFC928;
+            color: #101216;
+        }
+    )");
+
     // OSX magic.
     setUnifiedTitleAndToolBarOnMac(true);
 

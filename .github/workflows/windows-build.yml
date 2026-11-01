@@ -1,0 +1,44 @@
+name: BLADEX CLIENT Windows Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build:
+    runs-on: windows-2022
+
+    steps:
+      - name: Download source code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Qt 5.15.2
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: 5.15.2
+          host: windows
+          target: desktop
+          arch: win64_mingw81
+          tools: 'tools_mingw,8.1.0'
+
+      - name: Configure project
+        shell: bash
+        run: |
+          cmake -S . -B build -G "MinGW Makefiles" \
+            -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build BLADEX CLIENT
+        shell: bash
+        run: |
+          cmake --build build --parallel 2
+
+      - name: Upload build files
+        uses: actions/upload-artifact@v4
+        with:
+          name: BLADEX-CLIENT-Windows
+          path: build/
+          if-no-files-found: error
